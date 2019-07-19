@@ -40,14 +40,16 @@ module Canvas
       Canvas::API.encode_id(prefix, id)
     end
   
-    def oauth_url(callback_url, scopes="")
+    def oauth_url(callback_url, options = {})
       raise "client_id required for oauth flow" unless @client_id
       raise "secret required for oauth flow" unless @secret
       raise "callback_url required" unless callback_url
       raise "invalid callback_url" unless (URI.parse(callback_url) rescue nil)
-      scopes ||= ""
+      scopes = options[:scopes] || ""
       scopes = scopes.length > 0 ? "&scopes=#{CGI.escape(scopes)}" : ""
-      "#{@host}/login/oauth2/auth?client_id=#{@client_id}&response_type=code&redirect_uri=#{CGI.escape(callback_url)}#{scopes}"
+      state = options[:state] || ""
+      state = state.length > 0 ? "&state=#{CGI.escape(state)}" : ""
+      "#{@host}/login/oauth2/auth?client_id=#{@client_id}&response_type=code&redirect_uri=#{CGI.escape(callback_url)}#{scopes}#{state}"
     end
   
     def login_url(callback_url)
